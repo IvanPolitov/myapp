@@ -6,7 +6,7 @@ def gen_plus_minus():
     b = random.randint(-99, 100)
     if b <= 0:
         sign = ''
-    text = str(a) + sign + str(b)
+    text = str(a) + sign + str(b) + '='
     result = str(a + b)
     return text, result
 

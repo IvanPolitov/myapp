@@ -10,6 +10,7 @@ class UnitPlusMinus(Frame):
         self.center_window()
         self.parent.title("Математика")
 
+
         f_main = LabelFrame(self.parent, text='Main block')
         f_system = LabelFrame(self.parent, text='system')
         f_main.pack(expand=1, fill=BOTH)
@@ -31,9 +32,9 @@ class UnitPlusMinus(Frame):
         button_generate = Button(f_system, text='Новый пример', command=self.gen)
         button_generate.pack(side=LEFT, anchor=W)
 
-        parent.bind("<Return>", self.qqq)
+        parent.bind("<Return>", self.check_answer_press_enter)
 
-    def qqq(self, event):
+    def check_answer_press_enter(self, event):
         self.check_answer()
     def center_window(self):
         """Размер окна и центрирование"""
@@ -42,7 +43,7 @@ class UnitPlusMinus(Frame):
 
         sw = self.parent.winfo_screenwidth()
         sh = self.parent.winfo_screenheight()
-
+        self.parent.resizable(False, False)
         x = (sw - w) / 2
         y = (sh - h) / 2
         self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))

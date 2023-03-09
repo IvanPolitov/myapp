@@ -31,6 +31,10 @@ class UnitPlusMinus(Frame):
         button_generate = Button(f_system, text='Новый пример', command=self.gen)
         button_generate.pack(side=LEFT, anchor=W)
 
+        parent.bind("<Return>", self.qqq)
+
+    def qqq(self, event):
+        self.check_answer()
     def center_window(self):
         """Размер окна и центрирование"""
         w = 400

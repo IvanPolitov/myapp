@@ -2,32 +2,204 @@ import mymath
 from tkinter import *
 from tkinter import messagebox as mb
 
+BUTTON_W_MAIN_MENU = 170
+BUTTON_H_MAIN_MENU = 40
+GUIDE_TXT_FILE = 'guide_text.txt'
 
-class Start(Frame):
+class MainWindow(Frame):
     def __init__(self, parent):
-        super(Start, self).__init__()
+        self.pixelVirtual = PhotoImage(width=1, height=1)
+        super(MainWindow, self).__init__()
         self.parent = parent
-        self.main_window_setting()
+        self.window_setting()
+        self.make_MainMenu()
+        self.parent.bind("<q>", self.vihod)
+
+        menubar = Menu(self.parent)
+        self.parent.config(menu=menubar)
+        file_menubar = Menu(menubar, tearoff=0)
+        file_menubar.add_command(label='О программе')
+        file_menubar.add_command(label='Выход', command=quit)
+
+        menubar.add_cascade(label='Файл', menu=file_menubar)
+        menubar.add_command(label='Справка', command=self.call_Guide)
+
+    def make_MainMenu(self):
+        self.frame_MainMenu = Frame(self.parent)
+        self.frame_MainMenu.pack(expand=1, fill=X)
+
+        frame_btn_add_mult_div = Frame(self.frame_MainMenu)
+        frame_btn_add_mult_div.pack(expand=1, fill=X)
+
+        frame_btn_another = Frame(self.frame_MainMenu)
+        frame_btn_another.pack(expand=1, fill=X, ipady=5)
+
+        button_add = Button(frame_btn_add_mult_div,
+                                   text='Сложение',
+                                   command=self.call_UnitAdd,
+                                   image=self.pixelVirtual,
+                                   width=BUTTON_W_MAIN_MENU,
+                                   height=BUTTON_H_MAIN_MENU,
+                                   compound='center',
+                                   font="Arial 20")
+
+        button_multiply = Button(frame_btn_add_mult_div,
+                                 text='Умножение',
+                                 command=self.call_UnitMultiply,
+                                 image=self.pixelVirtual,
+                                 width=BUTTON_W_MAIN_MENU,
+                                 height=BUTTON_H_MAIN_MENU,
+                                 compound='center',
+                                 font="Arial 20")
+
+        button_div = Button(frame_btn_add_mult_div,
+                            text='Деление',
+                            command=self.call_UnitAdd,
+                            image=self.pixelVirtual,
+                            width=BUTTON_W_MAIN_MENU,
+                            height=BUTTON_H_MAIN_MENU,
+                            compound='center',
+                            font="Arial 20")
+
+        button_f1 = Button(frame_btn_another,
+                                   text='f1',
+                                   # command=self.call_UnitAdd,
+                                   image=self.pixelVirtual,
+                                   width=BUTTON_W_MAIN_MENU,
+                                   height=BUTTON_H_MAIN_MENU,
+                                   compound='center',
+                                   font="Arial 20")
+
+        button_f2 = Button(frame_btn_another,
+                                 text='f2',
+                                 # command=self.call_UnitMultiply,
+                                 image=self.pixelVirtual,
+                                 width=BUTTON_W_MAIN_MENU,
+                                 height=BUTTON_H_MAIN_MENU,
+                                 compound='center',
+                                 font="Arial 20")
+
+        button_f3 = Button(frame_btn_another,
+                            text='f3',
+                            # command=self.call_UnitAdd,
+                            image=self.pixelVirtual,
+                            width=BUTTON_W_MAIN_MENU,
+                            height=BUTTON_H_MAIN_MENU,
+                            compound='center',
+                            font="Arial 20")
+        button_quit = Button(self.frame_MainMenu,
+                            text='Выход',
+                            command=quit,
+                            image=self.pixelVirtual,
+                            width=BUTTON_W_MAIN_MENU,
+                            height=BUTTON_H_MAIN_MENU,
+                            compound='center',
+                            font="Arial 20")
+
+
+        button_add.pack(side=LEFT, padx=8)
+        button_multiply.pack(side=LEFT)
+        button_div.pack(side=LEFT, padx=8)
+        button_f1.pack(side=LEFT, padx=8)
+        button_f2.pack(side=LEFT)
+        button_f3.pack(side=LEFT, padx=8)
+        button_quit.pack(pady=15)
+
+
+    def call_Guide(self):
+        file = open(GUIDE_TXT_FILE, 'r', encoding='utf-8')
+        txt = file.read()
+        file.close()
+
+        wdw = Toplevel()
+        Label(wdw, text=txt, font="Arial 11").pack(expand=1)
+        Button(wdw, text='Закрыть', command=wdw.destroy, font="Arial 14").pack(side=RIGHT)
+
+
+    def call_UnitAdd(self):
+        self.frame_MainMenu.pack_forget()
+        self.make_UnitAdd()
+
+    def call_MainMenu(self):
+        self.frame_MainMenu.pack(expand=1, fill=X)
+
+    def make_UnitAdd(self):
+        # Main для основных действий программы, system - для вспомогательных
         self.f_main = Frame(self.parent)
+        self.f_system = Frame(self.parent)
         self.f_main.pack(expand=1, fill=BOTH)
-        button_plus_minus = Button(self.f_main, text='Сложение', command=self.call_UnitPlusMinus)
-        button_plus_minus.pack()
+        self.f_system.pack(anchor=S, expand=0, fill=X)
 
-        button_multiply = Button(self.f_main, text='Умножение', command=self.call_UnitMultiply)
-        button_multiply.pack()
+        # Строка где будут наши выражения
+        self.example = Label(self.f_main, text='example', font="Arial 20", width=7)
+        self.example.pack(side=LEFT, anchor=NW)
+        self.result = 0
 
-    def call_UnitPlusMinus(self):
-        self.f_main.destroy()
-        UnitPlusMinus(self.parent)
+        # Поле для ввода данных
+        self.user_result = Entry(self.f_main, font="Arial 20", width=5)
+        self.user_result.pack(side=LEFT, anchor=NW)
+
+        # Кнопка для проверки введенного ответа
+        button_answer = Button(self.f_main, text='Ответить', command=self.check_answer, font="Arial 14")
+        button_answer.pack(side=LEFT, anchor=NW)
+
+        # Кнопка для выхода
+        button_quit = Button(self.f_system, text='Закрыть', command=self.quit)
+        button_quit.pack(side=RIGHT, anchor=E)
+
+        # Кнопка для генерации нового выражения в строке example
+        button_generate = Button(self.f_system, text='Новый пример', command=self.gen)
+        button_generate.pack(side=LEFT, anchor=W)
+
+        # Кнопка для генерации нового окна
+        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainMenu)
+        button_new_window.pack(side=LEFT, anchor=W)
+
+        # Забиндили энтер с той же функцией, что и button_answer
+        self.parent.bind("<Return>", self.check_answer_press_enter)
+
+        self.gen()
+
+    def check_answer_press_enter(self, event):
+        self.check_answer()
+
+    def vihod(self, event):
+        self.quit()
+    def gen(self):
+        self.example['text'], self.result = mymath.gen_plus_minus()
+
+    # Проверка ответа
+    def check_answer(self):
+        if self.check_isdigit():
+            if self.user_result.get() == self.result:
+                self.gen()
+                self.user_result.delete(0, END)
+            else:
+                mb.showwarning("Неверно", "Неправильный ответ")
+
+    # Проверка, число ли вписано
+    def check_isdigit(self):
+        s = self.user_result.get()
+        if s != '' and (s.isdigit() or s[0] == '-' and s[1:].isdigit()):
+            return True
+        else:
+            mb.showerror("Ошибка", "Введите число")
+            return False
+
+    # def call_MainWindow(self):
+    #     self.f_main.destroy()
+    #     self.f_system.destroy()
+    #     self.make_MainMenu()
+
 
     def call_UnitMultiply(self):
         self.f_main.destroy()
         UnitMultiply(self.parent)
 
-    def main_window_setting(self):
+    def window_setting(self):
         """Размер окна и центрирование"""
-        w = 400
-        h = 200
+        w = 565
+        h = 400
         self.parent.title("Математика")
         sw = self.parent.winfo_screenwidth()
         sh = self.parent.winfo_screenheight()
@@ -71,19 +243,13 @@ class UnitPlusMinus(Frame):
         button_generate.pack(side=LEFT, anchor=W)
 
         # Кнопка для генерации нового окна
-        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_Start)
+        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainWindow)
         button_new_window.pack(side=LEFT, anchor=W)
 
         # Забиндили энтер с той же функцией, что и button_answer
         parent.bind("<Return>", self.check_answer_press_enter)
         self.gen()
 
-    def new_window(self):
-        a = Toplevel()
-        a.geometry('200x200')
-        Label(a, text='лошадь').pack()
-        button_quit1 = Button(a, text='Закрыть', command=self.quit)
-        button_quit1.pack(side=RIGHT, anchor=E)
 
     # check_answer для энтера
     def check_answer_press_enter(self, event):
@@ -124,10 +290,10 @@ class UnitPlusMinus(Frame):
             mb.showerror("Ошибка", "Введите число")
             return False
 
-    def call_Start(self):
+    def call_MainWindow(self):
         self.f_main.destroy()
         self.f_system.destroy()
-        Start(self.parent)
+        MainWindow(self.parent)
 
 class UnitMultiply(Frame):
     def __init__(self, parent):
@@ -163,7 +329,7 @@ class UnitMultiply(Frame):
         button_generate.pack(side=LEFT, anchor=W)
 
         # Кнопка для генерации нового окна
-        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_Start)
+        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainWindow)
         button_new_window.pack(side=LEFT, anchor=W)
 
         # Забиндили энтер с той же функцией, что и button_answer
@@ -209,14 +375,14 @@ class UnitMultiply(Frame):
             mb.showerror("Ошибка", "Введите число")
             return False
 
-    def call_Start(self):
+    def call_MainWindow(self):
         self.f_main.destroy()
         self.f_system.destroy()
-        Start(self.parent)
+        MainWindow(self.parent)
 
 def main():
     main_window = Tk()
-    app = Start(main_window)
+    app = MainWindow(main_window)
     main_window.mainloop()
 
 

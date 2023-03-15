@@ -8,12 +8,13 @@ GUIDE_TXT_FILE = 'guide_text.txt'
 
 class MainWindow(Frame):
     def __init__(self, parent):
-        self.pixelVirtual = PhotoImage(width=1, height=1)
         super(MainWindow, self).__init__()
+        self.pixelVirtual = PhotoImage(width=1, height=1)
         self.parent = parent
         self.window_setting()
         self.make_MainMenu()
-        self.parent.bind("<q>", self.vihod)
+
+        self.parent.bind("<q>", self.quit)
 
         menubar = Menu(self.parent)
         self.parent.config(menu=menubar)
@@ -23,6 +24,17 @@ class MainWindow(Frame):
 
         menubar.add_cascade(label='Файл', menu=file_menubar)
         menubar.add_command(label='Справка', command=self.call_Guide)
+
+    def call_Guide(self):
+        file = open(GUIDE_TXT_FILE, 'r', encoding='utf-8')
+        txt = file.read()
+        file.close()
+        wdw = Toplevel()
+        Label(wdw, text=txt, font="Arial 11").pack(expand=1)
+        Button(wdw, text='Закрыть', command=wdw.destroy, font="Arial 14").pack(side=RIGHT)
+
+    def vihod(self, event):
+        self.quit()
 
     def make_MainMenu(self):
         self.frame_MainMenu = Frame(self.parent)
@@ -96,7 +108,6 @@ class MainWindow(Frame):
                             compound='center',
                             font="Arial 20")
 
-
         button_add.pack(side=LEFT, padx=8)
         button_multiply.pack(side=LEFT)
         button_div.pack(side=LEFT, padx=8)
@@ -106,95 +117,12 @@ class MainWindow(Frame):
         button_quit.pack(pady=15)
 
 
-    def call_Guide(self):
-        file = open(GUIDE_TXT_FILE, 'r', encoding='utf-8')
-        txt = file.read()
-        file.close()
-
-        wdw = Toplevel()
-        Label(wdw, text=txt, font="Arial 11").pack(expand=1)
-        Button(wdw, text='Закрыть', command=wdw.destroy, font="Arial 14").pack(side=RIGHT)
-
-
     def call_UnitAdd(self):
         self.frame_MainMenu.pack_forget()
-        self.make_UnitAdd()
+        self.q = UnitWindow(self.parent)
 
     def call_MainMenu(self):
         self.frame_MainMenu.pack(expand=1, fill=X)
-
-    def make_UnitAdd(self):
-        # Main для основных действий программы, system - для вспомогательных
-        self.f_main = Frame(self.parent)
-        self.f_system = Frame(self.parent)
-        self.f_main.pack(expand=1, fill=BOTH)
-        self.f_system.pack(anchor=S, expand=0, fill=X)
-
-        # Строка где будут наши выражения
-        self.example = Label(self.f_main, text='example', font="Arial 20", width=7)
-        self.example.pack(side=LEFT, anchor=NW)
-        self.result = 0
-
-        # Поле для ввода данных
-        self.user_result = Entry(self.f_main, font="Arial 20", width=5)
-        self.user_result.pack(side=LEFT, anchor=NW)
-
-        # Кнопка для проверки введенного ответа
-        button_answer = Button(self.f_main, text='Ответить', command=self.check_answer, font="Arial 14")
-        button_answer.pack(side=LEFT, anchor=NW)
-
-        # Кнопка для выхода
-        button_quit = Button(self.f_system, text='Закрыть', command=self.quit)
-        button_quit.pack(side=RIGHT, anchor=E)
-
-        # Кнопка для генерации нового выражения в строке example
-        button_generate = Button(self.f_system, text='Новый пример', command=self.gen)
-        button_generate.pack(side=LEFT, anchor=W)
-
-        # Кнопка для генерации нового окна
-        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainMenu)
-        button_new_window.pack(side=LEFT, anchor=W)
-
-        # Забиндили энтер с той же функцией, что и button_answer
-        self.parent.bind("<Return>", self.check_answer_press_enter)
-
-        self.gen()
-
-    def check_answer_press_enter(self, event):
-        self.check_answer()
-
-    def vihod(self, event):
-        self.quit()
-    def gen(self):
-        self.example['text'], self.result = mymath.gen_plus_minus()
-
-    # Проверка ответа
-    def check_answer(self):
-        if self.check_isdigit():
-            if self.user_result.get() == self.result:
-                self.gen()
-                self.user_result.delete(0, END)
-            else:
-                mb.showwarning("Неверно", "Неправильный ответ")
-
-    # Проверка, число ли вписано
-    def check_isdigit(self):
-        s = self.user_result.get()
-        if s != '' and (s.isdigit() or s[0] == '-' and s[1:].isdigit()):
-            return True
-        else:
-            mb.showerror("Ошибка", "Введите число")
-            return False
-
-    # def call_MainWindow(self):
-    #     self.f_main.destroy()
-    #     self.f_system.destroy()
-    #     self.make_MainMenu()
-
-
-    def call_UnitMultiply(self):
-        self.f_main.destroy()
-        UnitMultiply(self.parent)
 
     def window_setting(self):
         """Размер окна и центрирование"""
@@ -208,28 +136,27 @@ class MainWindow(Frame):
         y = (sh - h) / 2
         self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-
-class UnitPlusMinus(Frame):
+class UnitWindow(Frame):
     def __init__(self, parent):
-        super(UnitPlusMinus, self).__init__()
+        super(UnitWindow, self).__init__()
         self.parent = parent
-        self.main_window_setting()
+        self.result = 0
 
-        # Main для основных действий программы, system - для вспомогательных
-        self.f_main = Frame(self.parent)
-        self.f_system = Frame(self.parent)
+        self.UnitFrame = Frame(self.parent)
+        self.UnitFrame.pack(expand=1, fill=BOTH)
+        self.f_main = Frame(self.UnitFrame)
+        self.f_system = Frame(self.UnitFrame)
+        #
+        # self.f_main = Frame(self.parent)
+        # self.f_system = Frame(self.parent)
         self.f_main.pack(expand=1, fill=BOTH)
         self.f_system.pack(anchor=S, expand=0, fill=X)
 
-        # Строка где будут наши выражения
-        self.example = Label(self.f_main, text='example', font="Arial 20")
+        self.example = Label(self.f_main, font='Arial 20', width=7)
         self.example.pack(side=LEFT, anchor=NW)
-        self.result = 0
 
-        # Поле для ввода данных
-        self.user_result = Entry(self.f_main, font="Arial 20", width=5)
+        self.user_result = Entry(self.f_main, font='Arial 20', width=7)
         self.user_result.pack(side=LEFT, anchor=NW)
-
         # Кнопка для проверки введенного ответа
         button_answer = Button(self.f_main, text='Ответить', command=self.check_answer, font="Arial 14")
         button_answer.pack(side=LEFT, anchor=NW)
@@ -243,142 +170,37 @@ class UnitPlusMinus(Frame):
         button_generate.pack(side=LEFT, anchor=W)
 
         # Кнопка для генерации нового окна
-        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainWindow)
-        button_new_window.pack(side=LEFT, anchor=W)
+        # button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainMenu)
+        # button_new_window.pack(side=LEFT, anchor=W)
 
         # Забиндили энтер с той же функцией, что и button_answer
-        parent.bind("<Return>", self.check_answer_press_enter)
+        # self.parent.bind("<Return>", self.check_answer_press_enter)
+
         self.gen()
 
+    def check_answer(self):
+        if self.check_isdigit():
+            if self.user_result.get() == self.result:
+                self.gen()
+                self.user_result.delete(0, END)
+            else:
+                mb.showwarning("Неверно", "Неправильный ответ")
 
-    # check_answer для энтера
     def check_answer_press_enter(self, event):
         self.check_answer()
 
-    # Настройка параметров окна приложения
-    def main_window_setting(self):
-        """Размер окна и центрирование"""
-        w = 400
-        h = 200
-        self.parent.title("Математика")
-        sw = self.parent.winfo_screenwidth()
-        sh = self.parent.winfo_screenheight()
-        self.parent.resizable(False, False)
-        x = (sw - w) / 2
-        y = (sh - h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    def check_isdigit(self):
+        s = self.user_result.get()
+        if s != '' and (s.isdigit() or s[0] == '-' and s[1:].isdigit()):
+            return True
+        else:
+            mb.showerror("Ошибка", "Введите число")
+            return False
 
-    # Генерация выражения и правильного ответа для проверки
     def gen(self):
         self.example['text'], self.result = mymath.gen_plus_minus()
 
-    # Проверка ответа
-    def check_answer(self):
-        if self.check_isdigit():
-            if self.user_result.get() == self.result:
-                self.gen()
-                self.user_result.delete(0, END)
-            else:
-                mb.showwarning("Неверно", "Неправильный ответ")
 
-    # Проверка, число ли вписано
-    def check_isdigit(self):
-        s = self.user_result.get()
-        if s != '' and (s.isdigit() or s[0] == '-' and s[1:].isdigit()):
-            return True
-        else:
-            mb.showerror("Ошибка", "Введите число")
-            return False
-
-    def call_MainWindow(self):
-        self.f_main.destroy()
-        self.f_system.destroy()
-        MainWindow(self.parent)
-
-class UnitMultiply(Frame):
-    def __init__(self, parent):
-        super(UnitMultiply, self).__init__()
-        self.parent = parent
-        self.main_window_setting()
-
-        # Main для основных действий программы, system - для вспомогательных
-        self.f_main = Frame(self.parent)
-        self.f_system = Frame(self.parent)
-        self.f_main.pack(expand=1, fill=BOTH)
-        self.f_system.pack(anchor=S, expand=0, fill=X)
-
-        # Строка где будут наши выражения
-        self.example = Label(self.f_main, text='example', font="Arial 20")
-        self.example.pack(side=LEFT, anchor=NW)
-        self.result = 0
-
-        # Поле для ввода данных
-        self.user_result = Entry(self.f_main, font="Arial 20", width=5)
-        self.user_result.pack(side=LEFT, anchor=NW)
-
-        # Кнопка для проверки введенного ответа
-        button_answer = Button(self.f_main, text='Ответить', command=self.check_answer, font="Arial 14")
-        button_answer.pack(side=LEFT, anchor=NW)
-
-        # Кнопка для выхода
-        button_quit = Button(self.f_system, text='Закрыть', command=self.quit)
-        button_quit.pack(side=RIGHT, anchor=E)
-
-        # Кнопка для генерации нового выражения в строке example
-        button_generate = Button(self.f_system, text='Новый пример', command=self.gen)
-        button_generate.pack(side=LEFT, anchor=W)
-
-        # Кнопка для генерации нового окна
-        button_new_window = Button(self.f_system, text='Главное меню', command=self.call_MainWindow)
-        button_new_window.pack(side=LEFT, anchor=W)
-
-        # Забиндили энтер с той же функцией, что и button_answer
-        parent.bind("<Return>", self.check_answer_press_enter)
-        self.gen()
-
-    # check_answer для энтера
-    def check_answer_press_enter(self, event):
-        self.check_answer()
-
-    # Настройка параметров окна приложения
-    def main_window_setting(self):
-        """Размер окна и центрирование"""
-        w = 400
-        h = 200
-        self.parent.title("Математика")
-        sw = self.parent.winfo_screenwidth()
-        sh = self.parent.winfo_screenheight()
-        self.parent.resizable(False, False)
-        x = (sw - w) / 2
-        y = (sh - h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
-
-    # Генерация выражения и правильного ответа для проверки
-    def gen(self):
-        self.example['text'], self.result = mymath.gen_multiply()
-
-    # Проверка ответа
-    def check_answer(self):
-        if self.check_isdigit():
-            if self.user_result.get() == self.result:
-                self.gen()
-                self.user_result.delete(0, END)
-            else:
-                mb.showwarning("Неверно", "Неправильный ответ")
-
-    # Проверка, число ли вписано
-    def check_isdigit(self):
-        s = self.user_result.get()
-        if s != '' and (s.isdigit() or s[0] == '-' and s[1:].isdigit()):
-            return True
-        else:
-            mb.showerror("Ошибка", "Введите число")
-            return False
-
-    def call_MainWindow(self):
-        self.f_main.destroy()
-        self.f_system.destroy()
-        MainWindow(self.parent)
 
 def main():
     main_window = Tk()

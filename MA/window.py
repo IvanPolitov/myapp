@@ -28,8 +28,10 @@ class MainWindow(Frame):
 
         self.UnitAdd = UnitAdd(self.parent)
         self.units_list.append(self.UnitAdd)
+
         self.UnitMulti = UnitMulti(self.parent)
         self.units_list.append(self.UnitMulti)
+
         self.UnitDiv = UnitDiv(self.parent)
         self.units_list.append(self.UnitDiv)
 
@@ -64,6 +66,7 @@ class MainWindow(Frame):
         """Размер окна и центрирование"""
         w = 565
         h = 400
+        self.parent['bg'] = 'green'
         self.parent.title("Математика")
         sw = self.parent.winfo_screenwidth()
         sh = self.parent.winfo_screenheight()
@@ -80,11 +83,11 @@ class MainMenu(Frame):
         self.units_list = units_list
         self.pixelVirtual = PhotoImage(width=1, height=1)
 
-        self.MainFrame = Frame(self.parent)
-        frame_btn_add_mult_div = Frame(self.MainFrame)
+        self.MainFrame = Frame(self.parent, bg='green')
+        frame_btn_add_mult_div = Frame(self.MainFrame, bg='green')
         frame_btn_add_mult_div.pack(expand=1, fill=X)
 
-        frame_btn_another = Frame(self.MainFrame)
+        frame_btn_another = Frame(self.MainFrame, bg='green')
         frame_btn_another.pack(expand=1, fill=X, ipady=5)
 
         button_add = Button(frame_btn_add_mult_div,
@@ -177,7 +180,7 @@ class UnitWindow(Frame):
         self.pixelVirtual = PhotoImage(width=1, height=1)
 
         self.MainFrame = Frame(self.parent)
-        self.f_main = Frame(self.MainFrame)
+        self.f_main = Frame(self.MainFrame, bg='green')
         self.f_system = Frame(self.MainFrame)
 
         self.f_main.pack(expand=1, fill=BOTH)

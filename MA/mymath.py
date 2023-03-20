@@ -20,7 +20,17 @@ def gen_multiply():
     result = str(a * b)
     return text, result
 
+def gen_division():
+    a = random.randint(1, 10)
+    b = random.randint(1, 10)
+    result = str(a * b)
+
+    text = result + '/' + str(a) + '='
+
+    return text, str(b)
+
 
 if __name__ == '__main__':
     print(gen_plus_minus())
     print(gen_multiply())
+    print(gen_division())

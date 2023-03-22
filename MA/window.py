@@ -63,7 +63,7 @@ class MainWindow(Frame):
         name.MainFrame_pack()
 
     def window_setting(self):
-        """Размер окна и центрирование"""
+        # """Размер окна и центрирование"""
         w = 565
         h = 400
         self.parent['bg'] = 'green'
@@ -179,29 +179,66 @@ class UnitWindow(Frame):
         self.result = 0
         self.pixelVirtual = PhotoImage(width=1, height=1)
 
-        self.MainFrame = Frame(self.parent)
+        self.MainFrame = Frame(self.parent, bg='green')
         self.f_main = Frame(self.MainFrame, bg='green')
-        self.f_system = Frame(self.MainFrame)
+        self.f_parameters = LabelFrame(self.MainFrame, bg='green', text='Параметры', foreground='white',
+                                       font='Arial 15', relief=FLAT)
+        self.f_parameters_ab = Frame(self.f_parameters, bg='green')
+        self.f_parameters_ab.pack(expand=1, fill=X)
+        self.f_parameters_butt = Frame(self.f_parameters, bg='green')
+        self.f_parameters_butt.pack(expand=1, fill=X, pady=5)
+        self.f_system = Frame(self.MainFrame, bg='green')
 
         self.f_main.pack(expand=1, fill=BOTH)
+        self.f_parameters.pack(anchor=S, expand=0, fill=X, pady=5, padx=10)
         self.f_system.pack(anchor=S, expand=0, fill=X)
 
-        self.example = Label(self.f_main, font='Arial 20', width=7)
-        self.example.pack(side=LEFT, anchor=NW)
+        self.example = Label(self.f_main, font='Arial 22', width=7, foreground='white', background='green')
+        self.example.pack(side=TOP)
 
-        self.user_result = Entry(self.f_main, font='Arial 20', width=7)
-        self.user_result.pack(side=LEFT, anchor=NW)
+        self.user_result = Entry(self.f_main, font='Arial 22', width=7)
+        self.user_result.pack(side=TOP)
+
         # Кнопка для проверки введенного ответа
-        button_answer = Button(self.f_main, text='Ответить', command=self.check_answer, font="Arial 14")
-        button_answer.pack(side=LEFT, anchor=NW)
+        button_answer = Button(self.f_main, text='Ответить', image=self.pixelVirtual, width=BUTTON_W_MAIN_MENU,
+                               height=BUTTON_H_MAIN_MENU, command=self.check_answer, compound='center', font="Arial 20")
+        button_answer.pack(side=TOP, pady=10)
 
         # Кнопка для выхода
-        button_quit = Button(self.f_system, text='Закрыть', command=self.quit)
-        button_quit.pack(side=RIGHT, anchor=E)
+        button_quit = Button(self.f_system, text='Закрыть', image=self.pixelVirtual, width=BUTTON_W_MAIN_MENU,
+                             height=BUTTON_H_MAIN_MENU, command=self.quit, compound='center', font="Arial 20")
+        button_quit.pack(side=RIGHT, anchor=E, pady=2, padx=2)
+
+        Label(self.f_parameters_ab, font='Arial 22', text='a ∈ [', foreground='white', background='green').pack(
+            side=LEFT)
+        self.a1 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
+        self.a1.pack(side=LEFT)
+        Label(self.f_parameters_ab, font='Arial 22', text=';', foreground='white', background='green').pack(side=LEFT)
+        self.a2 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
+        self.a2.pack(side=LEFT)
+        Label(self.f_parameters_ab, font='Arial 22', text=']', foreground='white', background='green').pack(side=LEFT)
+        Label(self.f_parameters_ab, font='Arial 22', text='b ∈ [', foreground='white', background='green').pack(
+            side=LEFT)
+        self.b1 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
+        self.b1.pack(side=LEFT)
+        Label(self.f_parameters_ab, font='Arial 22', text=';', foreground='white', background='green').pack(side=LEFT)
+        self.b2 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
+        self.b2.pack(side=LEFT)
+        Label(self.f_parameters_ab, font='Arial 22', text=']', foreground='white', background='green').pack(side=LEFT)
+
+        button_edit = Button(self.f_parameters_butt, text='Редактировать', image=self.pixelVirtual,
+                             width=BUTTON_W_MAIN_MENU,
+                             height=BUTTON_H_MAIN_MENU, command=self.gen, compound='center', font="Arial 19")
+        button_edit.pack(side=LEFT, anchor=W, pady=2, padx=2)
+        button_accept = Button(self.f_parameters_butt, text='Принять', image=self.pixelVirtual,
+                               width=BUTTON_W_MAIN_MENU,
+                               height=BUTTON_H_MAIN_MENU, command=self.gen, compound='center', font="Arial 19")
+        button_accept.pack(side=RIGHT, anchor=E, pady=2, padx=2)
 
         # Кнопка для генерации нового выражения в строке example
-        button_generate = Button(self.f_system, text='Новый пример', command=self.gen)
-        button_generate.pack(side=LEFT, anchor=W)
+        button_generate = Button(self.f_system, text='Новый пример', image=self.pixelVirtual, width=BUTTON_W_MAIN_MENU,
+                                 height=BUTTON_H_MAIN_MENU, command=self.gen, compound='center', font="Arial 19")
+        button_generate.pack(side=LEFT, anchor=W, pady=2, padx=2)
 
         self.gen()
 
@@ -245,9 +282,14 @@ class UnitDiv(UnitWindow):
     def gen(self):
         self.example['text'], self.result = mymath.gen_division()
 
+
 def main():
     main_window = Tk()
+
     app = MainWindow(main_window)
+    main_window.update_idletasks()
+    print(main_window.winfo_width(), main_window.winfo_height())
+
     main_window.mainloop()
 
 

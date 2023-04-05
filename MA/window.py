@@ -1,6 +1,7 @@
 import mymath
 from tkinter import *
 from tkinter import messagebox as mb
+from tkinter import ttk
 
 BUTTON_W_MAIN_MENU = 170
 BUTTON_H_MAIN_MENU = 40
@@ -213,27 +214,41 @@ class UnitWindow(Frame):
             side=LEFT)
         self.a1 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
         self.a1.pack(side=LEFT)
+        self.a1.insert(0, '0')
+        self.a1['state'] = DISABLED
+
         Label(self.f_parameters_ab, font='Arial 22', text=';', foreground='white', background='green').pack(side=LEFT)
         self.a2 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
         self.a2.pack(side=LEFT)
+        self.a2.insert(0, '100')
+        self.a2['state'] = DISABLED
+
         Label(self.f_parameters_ab, font='Arial 22', text=']', foreground='white', background='green').pack(side=LEFT)
         Label(self.f_parameters_ab, font='Arial 22', text='b ∈ [', foreground='white', background='green').pack(
             side=LEFT)
+
         self.b1 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
         self.b1.pack(side=LEFT)
+        self.b1.insert(0, '0')
+        self.b1['state'] = DISABLED
+
         Label(self.f_parameters_ab, font='Arial 22', text=';', foreground='white', background='green').pack(side=LEFT)
         self.b2 = Entry(self.f_parameters_ab, font='Arial 22', width=3)
         self.b2.pack(side=LEFT)
+        self.b2.insert(0, '100')
+        self.b2['state'] = DISABLED
+
         Label(self.f_parameters_ab, font='Arial 22', text=']', foreground='white', background='green').pack(side=LEFT)
 
-        button_edit = Button(self.f_parameters_butt, text='Редактировать', image=self.pixelVirtual,
+        self.button_edit = Button(self.f_parameters_butt, text='Редактировать', image=self.pixelVirtual,
                              width=BUTTON_W_MAIN_MENU,
-                             height=BUTTON_H_MAIN_MENU, command=self.gen, compound='center', font="Arial 19")
-        button_edit.pack(side=LEFT, anchor=W, pady=2, padx=2)
-        button_accept = Button(self.f_parameters_butt, text='Принять', image=self.pixelVirtual,
-                               width=BUTTON_W_MAIN_MENU,
-                               height=BUTTON_H_MAIN_MENU, command=self.gen, compound='center', font="Arial 19")
-        button_accept.pack(side=RIGHT, anchor=E, pady=2, padx=2)
+                             height=BUTTON_H_MAIN_MENU, command=self.redact, compound='center', font="Arial 19")
+        self.button_edit.pack(side=LEFT, anchor=W, pady=2, padx=2)
+
+        self.button_accept = Button(self.f_parameters_butt, text='Принять', image=self.pixelVirtual,
+                               width=BUTTON_W_MAIN_MENU, state=DISABLED,
+                               height=BUTTON_H_MAIN_MENU, command=self.accept, compound='center', font="Arial 19")
+        self.button_accept.pack(side=RIGHT, anchor=E, pady=2, padx=2)
 
         # Кнопка для генерации нового выражения в строке example
         button_generate = Button(self.f_system, text='Новый пример', image=self.pixelVirtual, width=BUTTON_W_MAIN_MENU,
@@ -241,6 +256,20 @@ class UnitWindow(Frame):
         button_generate.pack(side=LEFT, anchor=W, pady=2, padx=2)
 
         self.gen()
+
+    def redact(self):
+        self.button_accept['state'] = NORMAL
+        self.a1['state'] = NORMAL
+        self.a2['state'] = NORMAL
+        self.b1['state'] = NORMAL
+        self.b2['state'] = NORMAL
+
+    def accept(self):
+        self.button_accept['state'] = DISABLED
+        self.a1['state'] = DISABLED
+        self.a2['state'] = DISABLED
+        self.b1['state'] = DISABLED
+        self.b2['state'] = DISABLED
 
     def MainFrame_pack(self):
         self.MainFrame.pack(expand=1, fill=BOTH)
@@ -265,22 +294,22 @@ class UnitWindow(Frame):
             return False
 
     def gen(self):
-        self.example['text'], self.result = mymath.gen_plus_minus()
+        pass
 
 
 class UnitAdd(UnitWindow):
     def gen(self):
-        self.example['text'], self.result = mymath.gen_plus_minus()
+        self.example['text'], self.result = mymath.gen_plus_minus(int(self.a1.get()), int(self.a2.get()), int(self.b1.get()), int(self.b2.get()))
 
 
 class UnitMulti(UnitWindow):
     def gen(self):
-        self.example['text'], self.result = mymath.gen_multiply()
+        self.example['text'], self.result = mymath.gen_multiply(int(self.a1.get()), int(self.a2.get()), int(self.b1.get()), int(self.b2.get()))
 
 
 class UnitDiv(UnitWindow):
     def gen(self):
-        self.example['text'], self.result = mymath.gen_division()
+        self.example['text'], self.result = mymath.gen_division(int(self.a1.get()), int(self.a2.get()), int(self.b1.get()), int(self.b2.get()))
 
 
 def main():
@@ -288,7 +317,6 @@ def main():
 
     app = MainWindow(main_window)
     main_window.update_idletasks()
-    print(main_window.winfo_width(), main_window.winfo_height())
 
     main_window.mainloop()
 
